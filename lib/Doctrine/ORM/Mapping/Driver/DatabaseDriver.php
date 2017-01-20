@@ -167,12 +167,21 @@ class DatabaseDriver implements MappingDriver
         }
     }
 
+    public function setTableClass($className, $tableName)
+    {
+        $this->classToTableNames[$className] = $tableName;
+    }
+
     /**
      * {@inheritDoc}
      */
     public function loadMetadataForClass($className, ClassMetadata $metadata)
     {
-        $this->reverseEngineerMappingFromDatabase();
+        if (isset($this->classToTableNames[$className])) {
+            $this->reverseEngineerMappingFromDatabase($this->classToTableNames[$className]);
+        } else {
+            $this->reverseEngineerMappingFromDatabase();
+        }
 
         if ( ! isset($this->classToTableNames[$className])) {
             throw new \InvalidArgumentException("Unknown class " . $className);
@@ -259,7 +268,7 @@ class DatabaseDriver implements MappingDriver
      *
      * @throws \Doctrine\ORM\Mapping\MappingException
      */
-    private function reverseEngineerMappingFromDatabase()
+    private function reverseEngineerMappingFromDatabase($tableName = null)
     {
         if ($this->tables !== null) {
             return;
@@ -267,7 +276,11 @@ class DatabaseDriver implements MappingDriver
 
         $tables = array();
 
-        foreach ($this->_sm->listTableNames() as $tableName) {
+        if (empty($tableName)) {
+            foreach ($this->_sm->listTableNames() as $tableName) {
+                $tables[$tableName] = $this->_sm->listTableDetails($tableName);
+            }
+        } else {
             $tables[$tableName] = $this->_sm->listTableDetails($tableName);
         }
 
@@ -520,7 +533,7 @@ class DatabaseDriver implements MappingDriver
      *
      * @return string
      */
-    private function getClassNameForTable($tableName)
+    public function getClassNameForTable($tableName)
     {
         if (isset($this->classNamesForTables[$tableName])) {
             return $this->namespace . $this->classNamesForTables[$tableName];
