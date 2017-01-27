@@ -82,6 +82,10 @@ class ConvertMappingCommand extends Command
                 'namespace', null, InputOption::VALUE_OPTIONAL,
                 'Defines a namespace for the generated entity classes, if converted from database.'
             ),
+            new InputOption(
+                'tablename', null, InputOption::VALUE_OPTIONAL,
+                'Defines a tablename.'
+            ),
         ))
         ->setHelp(<<<EOT
 Convert mapping information between supported formats.
@@ -132,8 +136,15 @@ EOT
 
         $cmf = new DisconnectedClassMetadataFactory();
         $cmf->setEntityManager($em);
-        $metadata = $cmf->getAllMetadata();
-        $metadata = MetadataFilter::filter($metadata, $input->getOption('filter'));
+        if (($tablename = $input->getOption('tablename')) !== null) {
+            $className = $databaseDriver->getClassNameForTable($tablename);
+            $databaseDriver->setTableClass($className, $tablename);
+            $metadata = $cmf->getMetadataFor($className);
+            $metadata = MetadataFilter::filter([$metadata], $input->getOption('filter'));
+        } else {
+            $metadata = $cmf->getAllMetadata();
+            $metadata = MetadataFilter::filter($metadata, $input->getOption('filter'));
+        }
 
         // Process destination directory
         if ( ! is_dir($destPath = $input->getArgument('dest-path'))) {
