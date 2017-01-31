@@ -19,6 +19,7 @@
 
 namespace Doctrine\ORM;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\Common\Collections\Selectable;
@@ -59,9 +60,9 @@ class EntityRepository implements ObjectRepository, Selectable
      * Initializes a new <tt>EntityRepository</tt>.
      *
      * @param EntityManager         $em    The EntityManager to use.
-     * @param Mapping\ClassMetadata $class The class descriptor.
+     * @param ClassMetadata         $class The class descriptor.(classを変えてあるのでinterfaceに変更)
      */
-    public function __construct($em, Mapping\ClassMetadata $class)
+    public function __construct($em, ClassMetadata $class)
     {
         $this->_entityName = $class->name;
         $this->_em         = $em;
