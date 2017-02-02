@@ -501,7 +501,9 @@ class DatabaseDriver implements MappingDriver
     private function getTablePrimaryKeys(Table $table)
     {
         try {
-            return $table->getPrimaryKey()->getColumns();
+            if ( $table->hasPrimaryKey()) {
+                return $table->getPrimaryKey()->getColumns();
+            }
         } catch(SchemaException $e) {
             // Do nothing
         }
