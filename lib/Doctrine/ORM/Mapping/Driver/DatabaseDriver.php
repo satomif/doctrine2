@@ -297,12 +297,12 @@ class DatabaseDriver implements MappingDriver
                 $allForeignKeyColumns = array_merge($allForeignKeyColumns, $foreignKey->getLocalColumns());
             }
 
-            if ( ! $table->hasPrimaryKey()) {
+/*            if ( ! $table->hasPrimaryKey()) {
                 throw new MappingException(
                     "Table " . $table->getName() . " has no primary key. Doctrine does not ".
                     "support reverse engineering from tables that don't have a primary key."
                 );
-            }
+            }*/
 
             $pkColumns = $table->getPrimaryKey()->getColumns();
 
